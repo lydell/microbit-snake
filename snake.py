@@ -15,6 +15,10 @@ BRIGHTNESS_APPLE_PERIOD = 1000
 SLEEP_APPLE = 10
 SLEEP_SNAKE = 500
 
+DEATH_BLINK_NUM = 3
+DEATH_BLINK_OFF_SLEEP = 300
+DEATH_BLINK_ON_SLEEP = 600
+
 MAX_X = 4
 MAX_Y = 4
 
@@ -47,6 +51,13 @@ while True:
             if spots:
                 apple_x, apple_y = random.choice(spots)
         elif (snake_x, snake_y) in snake_tail:
+            for i in range(0, DEATH_BLINK_NUM * 2):
+                if i % 2 == 0:
+                    microbit.display.off()
+                    microbit.sleep(DEATH_BLINK_OFF_SLEEP)
+                else:
+                    microbit.display.on()
+                    microbit.sleep(DEATH_BLINK_ON_SLEEP)
             microbit.display.scroll(str(score))
             break
         elif snake_tail:
