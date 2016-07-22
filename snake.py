@@ -36,6 +36,7 @@ while True:
 
     apple_x = snake_x
     apple_y = snake_y
+    apple_time = microbit.running_time()
 
     score = -1
 
@@ -50,6 +51,7 @@ while True:
             spots = list(ALL_SPOTS - set(snake_tail) - {(snake_x, snake_y)})
             if spots:
                 apple_x, apple_y = random.choice(spots)
+                apple_time = microbit.running_time()
         elif (snake_x, snake_y) in snake_tail:
             for i in range(0, DEATH_BLINK_NUM * 2):
                 if i % 2 == 0:
@@ -84,13 +86,13 @@ while True:
 
         for _ in range(0, SLEEP_SNAKE + 1, SLEEP_APPLE):
             if (apple_x, apple_y) != (snake_x, snake_y):
-                running_time = microbit.running_time()
+                time = microbit.running_time() - apple_time
                 frequency = 2 * math.pi / BRIGHTNESS_APPLE_PERIOD
                 brightness = min(
                     BRIGHTNESS_APPLE_MAX,
                     BRIGHTNESS_APPLE_MIN + math.floor(
                         (BRIGHTNESS_APPLE_MAX - BRIGHTNESS_APPLE_MIN) *
-                        (math.sin(running_time * frequency) + 1) *
+                        (math.sin(time * frequency) + 1) *
                         (0.5 + BRIGHTNESS_APPLE_MAX_BIAS)
                     )
                 )
