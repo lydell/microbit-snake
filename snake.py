@@ -27,7 +27,7 @@ ALL_SPOTS = frozenset(
 
 
 while True:
-    snake_x = MAX_X
+    snake_x = 0
     snake_y = 0
     snake_tail = []
 
