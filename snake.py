@@ -1,10 +1,19 @@
+import math
 import random
 
 import microbit
 
 
-BRIGHTNESS_SNAKE = 9
-BRIGHTNESS_APPLE = 6
+BRIGHTNESS_SNAKE_MIN = 6
+BRIGHTNESS_SNAKE_MAX = 9
+
+BRIGHTNESS_APPLE_MIN = 1
+BRIGHTNESS_APPLE_MAX = 9
+BRIGHTNESS_APPLE_MAX_BIAS = 0.25
+BRIGHTNESS_APPLE_PERIOD = 1000
+
+SLEEP_APPLE = 10
+SLEEP_SNAKE = 500
 
 MAX_X = 4
 MAX_Y = 4
@@ -29,8 +38,6 @@ while True:
     microbit.display.clear()
 
     while True:
-        microbit.sleep(500)
-
         a_was_pressed = microbit.button_a.was_pressed()
         b_was_pressed = microbit.button_b.was_pressed()
 
@@ -55,5 +62,26 @@ while True:
         else:
             snake_x = (snake_x + 2 - direction) % (MAX_X + 1)
 
-        microbit.display.set_pixel(apple_x, apple_y, BRIGHTNESS_APPLE)
-        microbit.display.set_pixel(snake_x, snake_y, BRIGHTNESS_SNAKE)
+        microbit.display.set_pixel(snake_x, snake_y, BRIGHTNESS_SNAKE_MAX)
+        tail_length = len(snake_tail)
+        for i, (tail_x, tail_y) in enumerate(snake_tail):
+            brightness = BRIGHTNESS_SNAKE_MIN + math.floor(
+                (BRIGHTNESS_SNAKE_MAX - BRIGHTNESS_SNAKE_MIN) *
+                (i / tail_length)
+            )
+            microbit.display.set_pixel(tail_x, tail_y, brightness)
+
+        for _ in range(0, SLEEP_SNAKE + 1, SLEEP_APPLE):
+            if (apple_x, apple_y) != (snake_x, snake_y):
+                running_time = microbit.running_time()
+                frequency = 2 * math.pi / BRIGHTNESS_APPLE_PERIOD
+                brightness = min(
+                    BRIGHTNESS_APPLE_MAX,
+                    BRIGHTNESS_APPLE_MIN + math.floor(
+                        (BRIGHTNESS_APPLE_MAX - BRIGHTNESS_APPLE_MIN) *
+                        (math.sin(running_time * frequency) + 1) *
+                        (0.5 + BRIGHTNESS_APPLE_MAX_BIAS)
+                    )
+                )
+                microbit.display.set_pixel(apple_x, apple_y, brightness)
+            microbit.sleep(SLEEP_APPLE)
